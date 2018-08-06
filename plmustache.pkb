@@ -66,35 +66,40 @@ as
     end loop;
 
     dbms_sql.close_cursor(l_cursor_int);
---    close l_cursor;
-    ---CHECK---
---    l_tmp:=l_aa.first;    
---    loop
---      exit when l_tmp is null;
---      for i in 1..l_aa(l_tmp).count loop
---        dbms_output.put_line(l_tmp||' == '||l_aa(l_tmp)(i));
---      end loop;
---      l_tmp:=l_aa.next(l_tmp);
---    end loop;
+    
+    /*    
+    ---CHECK DATA---
+    l_tmp:=l_aa.first;    
+    loop
+      exit when l_tmp is null;
+      for i in 1..l_aa(l_tmp).count loop
+        dbms_output.put_line(l_tmp||' == '||l_aa(l_tmp)(i));
+      end loop;
+      l_tmp:=l_aa.next(l_tmp);
+    end loop; 
+    */
     
   exception when others then
---    close l_cursor;
---    dbms_sql.close_cursor(l_cursor_int);
+    if dbms_sql.is_open(l_cursor_int) then
+      dbms_sql.close_cursor (l_cursor_int);
+    end if;
     raise;
   end;
   
-  function get_joined_value(str in varchar2) return varchar2 is
+  function get_joined_value(str in varchar2, esc in boolean) return varchar2 is
     l_out varchar2(32767 char):='';
   begin
-dbms_output.put_line('>>>'||l_out||l_aa(str).count);  
+
     for i in 1..l_aa(str).count loop
       l_out:=l_out||l_aa(str)(i);
+dbms_output.put_line('>>'||l_aa(str)(i));
     end loop;
-dbms_output.put_line('>>>'||l_out);  
+
     return l_out;
---    return case when str like '%NAME%' then l_aa('NAME')(1)||','||l_aa('NAME')(2)||','||l_aa('NAME')(3)
---    else l_aa('STADT')(1)||','||l_aa('STADT')(2)||','||l_aa('STADT')(3) end;
-  exception when no_data_found then return '';
+
+--  exception when no_data_found then 
+--  dbms_output.put_line(SQLERRM);
+--  return '';
   end;
   
   function get_single_value(str in varchar2, esc in boolean) return varchar2 is 
@@ -112,14 +117,35 @@ dbms_output.put_line('>>>'||l_out);
     
     query_to_aa;
   
-    l_out:=l_tpl;
-dbms_output.put_line('???');    
+    l_out:=l_tpl;   
+
+
+
+/*
     <<section_replacement>>
-    for hit in 1..regexp_count(l_tpl, c_re_tab) loop
-      l_tmp := regexp_substr(l_tpl, c_re_tab, 1, hit, 'i', 1);
-dbms_output.put_line('???'||hit||l_tmp);   
-      l_out:=regexp_replace(l_out, c_re_tab, get_joined_value(l_tmp), 1, 1);
+    for hit in 1..regexp_count(l_tpl, c_re_tab, 1, 'in') loop
+      l_tmp := regexp_substr(l_tpl, c_re_tab, 1, hit, 'in', 1);
+      -- like normal replacement, but in array length loop...
+
+--dbms_output.put_line('|'||l_tmp||'|');
+--dbms_output.put_line('++'||regexp_substr(l_tmp, c_re_var_esc, 1, 1, 'in', 1));
+--dbms_output.put_line('++'||regexp_count(l_tmp, c_re_var_esc));
+--      <<escaped_variable_replacement>>
+--      for hitx in 1..regexp_count(l_tmp, c_re_var_esc) loop
+--        l_out:=regexp_replace(l_out,
+--                              c_re_var_esc, 
+--                              get_joined_value(
+--                                regexp_substr(l_tmp, c_re_var_esc, 1, hitx, 'in', 1),
+--                                false
+--                              ),
+--                              1,
+--                              1);
+--      end loop escaped_variable_replacement;
+      
+--      l_out:=regexp_replace(l_out, c_re_tab, get_joined_value(l_tmp), 1, 1);
     end loop section_replacement;
+    dbms_output.put_line(l_out);
+*/    
     
     l_tpl:=l_out;
     <<unescaped_variable_replacement>>

@@ -25,6 +25,7 @@ end;
 /
 ```
 
+<!--
 Since SQL does not have an `BOOLEAN` data type, you can't check this values for executing sections or not. To make a loop over multiple values, use the TABLE keyword:
 
 ```
@@ -44,6 +45,8 @@ In the novel {{TITLE}} by {{AUTHOR}} are several protagonist:
 end;
 /
 ```
+
+-->
 
 ## License
 PLMustache is released under the [MIT license](https://github.com/teotiger/plmustache/blob/master/license.txt).
